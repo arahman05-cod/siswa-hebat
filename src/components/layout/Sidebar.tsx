@@ -13,7 +13,7 @@ import {
   BookOpen,
   ChevronRight,
   Sparkles,
-  LogOut,
+  RotateCcw,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -212,10 +212,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
 
           <button
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-teal-300 hover:bg-teal-500/10 hover:border-teal-500/30 transition-all cursor-pointer"
           >
-            <LogOut className="h-3.5 w-3.5" />
-            <span>Keluar dari Aplikasi</span>
+            <RotateCcw className="h-3.5 w-3.5 text-teal-400" />
+            <span>Segarkan Data & Sesi</span>
           </button>
         </div>
       </aside>

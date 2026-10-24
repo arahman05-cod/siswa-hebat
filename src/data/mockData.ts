@@ -11,7 +11,7 @@ import {
 } from '../types';
 
 export const mockSchoolProfile: SchoolProfile = {
-  name: 'SMKKS Kesehatan Fania Salsabila Kota Jambi
+  name: 'SMKS Kesehatan Fania Salsabila Kota Jambi',
   npsn: '20108921',
   address: 'Jl. Pendidikan Karakter No. 45, Kompleks Edukasi Terpadu',
   city: 'Kota Pelajar Harapan',

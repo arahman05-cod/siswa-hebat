@@ -29,8 +29,11 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
   const [roleLabel, setRoleLabel] = useState('');
   const [email, setEmail] = useState('');
   const [assignedClassIds, setAssignedClassIds] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    setErrorMessage('');
     if (userToEdit) {
       setName(userToEdit.name);
       setNip(userToEdit.nip);
@@ -44,7 +47,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
       setRole('wali_kelas');
       setRoleLabel('Wali Kelas');
       setEmail('');
-      setAssignedClassIds([classes[0]?.id || 'cls-xi-ak']);
+      setAssignedClassIds([classes[0]?.id || 'cls-xi-tlm']);
     }
   }, [userToEdit, isOpen, classes]);
 
@@ -76,7 +79,8 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    setIsSubmitting(true);
+    setErrorMessage('');
 
     const payload: Partial<UserProfile> = {
       name: name.trim(),
@@ -95,7 +99,9 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
       }
       onClose();
     } catch (err: any) {
-      alert(err.message || 'Gagal menyimpan data pengguna.');
+      setErrorMessage(err.message || 'Gagal menyimpan data pengguna.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -113,17 +119,42 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
                 {userToEdit ? 'Edit Pengguna & Hak Akses' : 'Tambah Pengguna Baru'}
               </h3>
               <p className="text-xs text-slate-500">
-                Penetapan identitas pegawai dan batas kewenangan sistem
+                Penetapan identitas pegawai, wewenang peran & sinkronisasi spreadsheet
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-200 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-200 transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Spreadsheet Sync Banner */}
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100 px-6 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-bold text-emerald-900">
+                Otomatis Tersimpan ke Google Spreadsheet: <span className="font-mono text-teal-700">Data_Pengguna</span>
+              </span>
+            </div>
+            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-200/60 text-emerald-800">
+              8 Kolom
+            </span>
+          </div>
+          <p className="text-[10px] text-emerald-700 mt-1 font-mono">
+            user_id • nama_lengkap • email • peran • class_id • aktif • cakupan_akses • tgl_ditambahkan
+          </p>
+        </div>
+
+        {/* Error message */}
+        {errorMessage && (
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+            {errorMessage}
+          </div>
+        )}
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
@@ -247,9 +278,17 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
             <button
               type="button"
               onClick={handleSubmit}
-              className="rounded-xl bg-teal-600 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-teal-500"
+              disabled={isSubmitting}
+              className={`rounded-xl px-5 py-2 text-xs font-semibold text-white shadow-sm transition-all flex items-center gap-1.5 cursor-pointer ${
+                isSubmitting
+                  ? 'bg-teal-400 cursor-not-allowed'
+                  : 'bg-teal-600 hover:bg-teal-500'
+              }`}
             >
-              {userToEdit ? 'Simpan Perubahan' : 'Tambah Pengguna'}
+              {isSubmitting && (
+                <span className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              )}
+              <span>{userToEdit ? 'Simpan Perubahan' : 'Tambah & Simpan ke Spreadsheet'}</span>
             </button>
           </div>
         </div>

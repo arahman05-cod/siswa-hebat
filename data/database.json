@@ -1,6 +1,6 @@
 {
   "schoolProfile": {
-    "name": "SMK Fania Salsabila Mandiri",
+    "name": "SMKS Kesehatan Fania Salsabila Kota Jambi",
     "npsn": "20108921",
     "address": "Jl. Raya Pendidikan No. 45",
     "city": "Kota Pelajar",
@@ -196,6 +196,30 @@
   "cases": [],
   "plans": [],
   "auditLogs": [
+    {
+      "id": "log-1792814254696-68",
+      "timestamp": "2026-10-24T03:57:34.696Z",
+      "userId": "anonim",
+      "userName": "Anonim",
+      "userRole": "Tamu",
+      "action": "Hapus Pengguna",
+      "resourceType": "User",
+      "resourceId": "usr-1792814250007",
+      "ipAddress": "127.0.0.1",
+      "summary": "Pengguna Siti Aminah, S.Pd. dihapus dari sistem"
+    },
+    {
+      "id": "log-1792814250008-478",
+      "timestamp": "2026-10-24T03:57:30.008Z",
+      "userId": "anonim",
+      "userName": "Anonim",
+      "userRole": "Tamu",
+      "action": "Tambah Pengguna",
+      "resourceType": "User",
+      "resourceId": "usr-1792814250007",
+      "ipAddress": "127.0.0.1",
+      "summary": "Akun pengguna Siti Aminah, S.Pd. (wali_kelas) dibuat"
+    },
     {
       "id": "log-1792680567217-145",
       "timestamp": "2026-10-22T14:49:27.217Z",

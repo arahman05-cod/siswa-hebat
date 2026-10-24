@@ -33,13 +33,8 @@ import {
 } from 'lucide-react';
 
 const MainAppContent: React.FC = () => {
-  const { isAuthenticated, activeTab, setActiveTab, classAgreements, incidentRecords, caseHandlings, schoolProfile } =
+  const { activeTab, setActiveTab, classAgreements, incidentRecords, caseHandlings, schoolProfile } =
     useApp();
-
-  // If user is not authenticated yet, show Login Page
-  if (!isAuthenticated) {
-    return <LoginPage />;
-  }
 
   // Mobile sidebar state
   const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);

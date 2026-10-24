@@ -146,14 +146,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
           </div>
         </div>
 
-        {/* Logout Button */}
+        {/* Reset / Refresh Session Button */}
         <button
           onClick={logout}
-          title="Keluar dari akun aplikasi"
-          className="flex h-9 w-9 sm:h-auto sm:w-auto items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2 sm:px-3 sm:py-2 text-xs font-bold text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 transition-colors shadow-2xs cursor-pointer"
+          title="Segarkan sesi aplikasi ke status aktif utama"
+          className="flex h-9 w-9 sm:h-auto sm:w-auto items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2 sm:px-3 sm:py-2 text-xs font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-800 transition-colors shadow-2xs cursor-pointer"
         >
-          <LogOut className="h-4 w-4" />
-          <span className="hidden sm:inline">Keluar</span>
+          <RotateCcw className="h-3.5 w-3.5 text-teal-600" />
+          <span className="hidden sm:inline">Segarkan Sesi</span>
         </button>
       </div>
     </header>

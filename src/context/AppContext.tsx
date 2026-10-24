@@ -55,6 +55,7 @@ interface AppContextType {
   updateSchoolProfile: (profile: Partial<SchoolProfile>) => Promise<void>;
   testSpreadsheetConnection: (webhookUrl: string, spreadsheetId?: string) => Promise<any>;
   syncClassesToSpreadsheet: (webhookUrl?: string, spreadsheetId?: string) => Promise<any>;
+  syncUsersToSpreadsheet: (webhookUrl?: string, spreadsheetId?: string) => Promise<any>;
   syncAllToSpreadsheet: (webhookUrl?: string, spreadsheetId?: string) => Promise<any>;
   seedDemoData: () => Promise<void>;
   clearDemoData: () => Promise<void>;
@@ -68,7 +69,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const TOKEN_STORAGE_KEY = 'ruang_kelas_auth_token';
 
 const defaultSchoolProfile: SchoolProfile = {
-  name: 'SMK Fania Salsabila Mandiri',
+  name: 'SMKS Kesehatan Fania Salsabila Kota Jambi',
   npsn: '20108921',
   address: 'Jl. Raya Pendidikan No. 45',
   city: 'Kota Pelajar',
@@ -96,8 +97,8 @@ const defaultAdminUser: UserProfile = {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_STORAGE_KEY));
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   const [currentUser, setCurrentUser] = useState<UserProfile>(defaultAdminUser);
@@ -127,7 +128,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (res.status === 401) {
         setToken(null);
         localStorage.removeItem(TOKEN_STORAGE_KEY);
-        setIsAuthenticated(false);
       }
       return res;
     },
@@ -212,20 +212,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [authFetch]);
 
-  // Initial authentication check
+  // Initial direct authentication initialization (No login barrier)
   useEffect(() => {
     const initAuth = async () => {
+      setIsAuthenticated(true);
       const savedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-      if (!savedToken) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
 
       try {
-        const res = await fetch('/api/auth/me', {
-          headers: { Authorization: `Bearer ${savedToken}` },
-        });
+        const headers: Record<string, string> = {};
+        if (savedToken) {
+          headers['Authorization'] = `Bearer ${savedToken}`;
+        }
+        const res = await fetch('/api/auth/me', { headers });
 
         if (res.ok) {
           const userData = await res.json();
@@ -239,18 +237,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             email: userData.email || 'admin@smkfania.sch.id',
             avatarInitials: getInitials(userData.name),
           });
-          setIsAuthenticated(true);
-          setToken(savedToken);
-          await refreshData();
-        } else {
-          localStorage.removeItem(TOKEN_STORAGE_KEY);
-          setToken(null);
-          setIsAuthenticated(false);
+          if (savedToken) setToken(savedToken);
         }
       } catch (err) {
-        console.error('Failed to verify session token:', err);
-        setIsAuthenticated(false);
+        console.warn('Direct access initialization notice:', err);
       } finally {
+        await refreshData();
         setIsLoading(false);
       }
     };
@@ -296,16 +288,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  // Logout handler
+  // Logout / Reset session handler (keeps application directly accessible)
   const logout = async () => {
     try {
       await authFetch('/api/auth/logout', { method: 'POST' });
     } catch (err) {
-      console.warn('Logout API call error:', err);
+      console.warn('Logout notice:', err);
     } finally {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
       setToken(null);
-      setIsAuthenticated(false);
+      setCurrentUser(defaultAdminUser);
+      setIsAuthenticated(true);
+      await refreshData();
     }
   };
 
@@ -676,6 +670,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return data;
   };
 
+  const syncUsersToSpreadsheet = async (webhookUrl?: string, spreadsheetId?: string): Promise<any> => {
+    const res = await authFetch('/api/spreadsheet/sync-users', {
+      method: 'POST',
+      body: JSON.stringify({ webhookUrl, spreadsheetId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Gagal sinkronisasi data pengguna ke Google Spreadsheet.');
+    }
+    return data;
+  };
+
   const syncAllToSpreadsheet = async (webhookUrl?: string, spreadsheetId?: string): Promise<any> => {
     const res = await authFetch('/api/spreadsheet/sync-all', {
       method: 'POST',
@@ -758,6 +764,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateSchoolProfile,
         testSpreadsheetConnection,
         syncClassesToSpreadsheet,
+        syncUsersToSpreadsheet,
         syncAllToSpreadsheet,
         seedDemoData,
         clearDemoData,

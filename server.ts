@@ -36,7 +36,7 @@ function getInitialDbState() {
   const masterAdmin = hashPassword('2009');
   return {
     schoolProfile: {
-      name: 'SMK Fania Salsabila Mandiri',
+      name: 'SMKS Kesehatan Fania Salsabila Kota Jambi',
       npsn: '20108921',
       address: 'Jl. Raya Pendidikan No. 45',
       city: 'Kota Pelajar',
@@ -270,17 +270,23 @@ function recordAuditLog(
 const app = express();
 app.use(express.json());
 
-// Auth Middleware
-function requireAuth(req: Request, res: Response, next: NextFunction) {
+function requireAuth(req: Request, _res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Sesi tidak ditemukan atau kedaluwarsa. Silakan masuk kembali.' });
-  }
+  let token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+  let sessionUser = token ? getSessionUser(token) : null;
 
-  const token = authHeader.slice(7);
-  const sessionUser = getSessionUser(token);
+  // Seamless Access Mode: if no valid token provided, automatically default to primary admin
   if (!sessionUser) {
-    return res.status(401).json({ error: 'Sesi tidak sah. Silakan masuk kembali.' });
+    const data = db.get();
+    const adminUser = data.users.find((u: any) => u.role === 'admin') || data.users[0];
+    sessionUser = {
+      userId: adminUser?.id || 'usr-admin-1',
+      username: adminUser?.username || 'smkfania',
+      name: adminUser?.name || 'Administrator Resmi (SMK Fania)',
+      role: adminUser?.role || 'admin',
+      roleLabel: adminUser?.roleLabel || 'Administrator Sistem & Data',
+      assignedClassIds: adminUser?.assignedClassIds || [],
+    };
   }
 
   (req as any).user = sessionUser;
