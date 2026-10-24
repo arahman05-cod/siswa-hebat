@@ -1,0 +1,6 @@
+{
+  "name": "Ruang Kelas — Kesepakatan dan Pendampingan Siswa",
+  "description": "Aplikasi web profesional untuk kesepakatan kelas, pencatatan kejadian faktual, dan pendampingan siswa berorientasi edukatif dengan menjaga kerahasiaan data.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
